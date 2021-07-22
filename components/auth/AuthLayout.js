@@ -11,7 +11,9 @@ const Container = styled.View`
 
 const Logo = styled.Image`
     max-width: 50%;
+    width: 100%;
     height: 100px;
+    margin-bottom: 20px;
 `;
 
 export default function AuthLayout({ children }) {

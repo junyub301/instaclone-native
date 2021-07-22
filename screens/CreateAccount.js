@@ -1,8 +1,8 @@
 import React from "react";
-import styled from "styled-components/native";
-import AuthLayout from "../components/auth/AuthLayout";
-import AuthButton from "../components/auth/AuthButton";
 import { TextInput } from "react-native";
+import styled from "styled-components/native";
+import AuthButton from "../components/auth/AuthButton";
+import AuthLayout from "../components/auth/AuthLayout";
 
 const Cotainer = styled.View`
     flex: 1;
