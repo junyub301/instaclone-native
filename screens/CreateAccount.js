@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text } from "react-native";
+import styled from "styled-components/native";
+
+const Cotainer = styled.View`
+    flex: 1;
+    background-color: black;
+`;
 export default function CreateAccount() {
-    return (
-        <View>
-            <Text>CreateAccount</Text>
-        </View>
-    );
+    return <Cotainer></Cotainer>;
 }
