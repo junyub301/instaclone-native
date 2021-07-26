@@ -5,12 +5,15 @@ import { Asset } from "expo-asset";
 import * as Font from "expo-font";
 import React, { useState } from "react";
 import LoggedOutNav from "./navigators/LoggedOutNav";
-import { ApolloProvider } from "@apollo/client";
-import client from "./apollo";
+import { ApolloProvider, useReactiveVar } from "@apollo/client";
+import client, { isLoggedInVar } from "./apollo";
+import LoggedInNav from "./navigators/LoggedInNav";
 
 export default function App() {
     const [loading, setLoading] = useState(true);
     const onFinish = () => setLoading(false);
+    const isLoggedIn = useReactiveVar(isLoggedInVar);
+
     const preload = () => {
         const fontToLoad = [Ionicons.font];
         const fontPromises = fontToLoad.map((font) => Font.loadAsync(font));
@@ -32,10 +35,11 @@ export default function App() {
             />
         );
     }
+
     return (
         <ApolloProvider client={client}>
             <NavigationContainer>
-                <LoggedOutNav />
+                {isLoggedIn ? <LoggedInNav /> : <LoggedOutNav />}
             </NavigationContainer>
         </ApolloProvider>
     );
