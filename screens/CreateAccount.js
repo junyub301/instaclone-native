@@ -14,20 +14,16 @@ export default function CreateAccount() {
     const onNext = (nextOne) => {
         nextOne?.current?.focus();
     };
-    const onDone = () => {
-        alert("done!");
-    };
-
     const onValid = (data) => {
         console.log(data);
     };
 
     useEffect(() => {
-        register("firstName");
-        register("lastName");
-        register("userName");
-        register("email");
-        register("password");
+        register("firstName", { required: true });
+        register("lastName", { required: true });
+        register("userName", { required: true });
+        register("email", { required: true });
+        register("password", { required: true });
     }, [register]);
     return (
         <AuthLayout>
@@ -59,6 +55,7 @@ export default function CreateAccount() {
                 ref={emailRef}
                 placeholder='Email'
                 keyboardType='email-address'
+                autoCapitalize='none'
                 returnKeyType='next'
                 onSubmitEditing={() => onNext(passwordRef)}
                 placeholderTextColor={"rgba(255,255,255,0.6)"}
@@ -67,10 +64,8 @@ export default function CreateAccount() {
             <TextInput
                 ref={passwordRef}
                 placeholder='Password'
-                autoCapitalize='none'
                 secureTextEntry
                 returnKeyType='done'
-                onSubmitEditing={onDone}
                 lastOne={true}
                 placeholderTextColor={"rgba(255,255,255,0.6)"}
                 onChangeText={(text) => setValue("password", text)}
@@ -78,8 +73,7 @@ export default function CreateAccount() {
             />
             <AuthButton
                 text='Create Account'
-                disabled={true}
-                onPoress={() => null}
+                disabled={false}
                 onPress={handleSubmit(onValid)}
             />
         </AuthLayout>

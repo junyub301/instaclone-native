@@ -5,6 +5,8 @@ import { Asset } from "expo-asset";
 import * as Font from "expo-font";
 import React, { useState } from "react";
 import LoggedOutNav from "./navigators/LoggedOutNav";
+import { ApolloProvider } from "@apollo/client";
+import client from "./apollo";
 
 export default function App() {
     const [loading, setLoading] = useState(true);
@@ -31,8 +33,10 @@ export default function App() {
         );
     }
     return (
-        <NavigationContainer>
-            <LoggedOutNav />
-        </NavigationContainer>
+        <ApolloProvider client={client}>
+            <NavigationContainer>
+                <LoggedOutNav />
+            </NavigationContainer>
+        </ApolloProvider>
     );
 }
