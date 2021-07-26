@@ -1,11 +1,10 @@
-import React, { useRef, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { gql, useMutation } from "@apollo/client";
+import React, { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { isLoggedInVar } from "../apollo";
+import AuthButton from "../components/auth/AuthButton";
 import AuthLayout from "../components/auth/AuthLayout";
 import { TextInput } from "../components/auth/AuthShared";
-import { useForm } from "react-hook-form";
-import AuthButton from "../components/auth/AuthButton";
-import { gql, useMutation } from "@apollo/client";
-import { isLoggedInVar } from "../apollo";
 
 const LOG_IN_MUTATION = gql`
     mutation login($username: String!, $password: String!) {
@@ -17,8 +16,13 @@ const LOG_IN_MUTATION = gql`
     }
 `;
 
-export default function Login() {
-    const { register, handleSubmit, setValue, watch } = useForm();
+export default function Login({ route: { params } }) {
+    const { register, handleSubmit, setValue, watch } = useForm({
+        defaultValues: {
+            password: params?.password,
+            username: params?.username,
+        },
+    });
     const passwordRef = useRef();
     const onCompleted = (data) => {
         const {
@@ -50,6 +54,7 @@ export default function Login() {
     return (
         <AuthLayout>
             <TextInput
+                value={watch("username")}
                 placeholder='Username'
                 returnKeyType='next'
                 autoCapitalize='none'
@@ -58,6 +63,7 @@ export default function Login() {
                 onChangeText={(text) => setValue("username", text)}
             />
             <TextInput
+                value={watch("password")}
                 ref={passwordRef}
                 placeholder='Password'
                 secureTextEntry
