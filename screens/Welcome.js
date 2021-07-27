@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components/native";
 import { colors } from "../colors";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native";
 import AuthLayout from "../components/auth/AuthLayout";
 import AuthButton from "../components/auth/AuthButton";
 
