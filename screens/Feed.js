@@ -1,8 +1,8 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { logUserOut } from "../apollo";
 import { gql, useQuery } from "@apollo/client";
-import { PHOTO_FRAGMENT, COMMNET_FRAGMENT } from "../fragments";
+import React from "react";
+import { FlatList, Text, View, ActivityIndicator } from "react-native";
+import { COMMNET_FRAGMENT, PHOTO_FRAGMENT } from "../fragments";
+import ScreenLayout from "../components/ScreenLayout";
 
 const FEED_QUERY = gql`
     query seeFeed {
@@ -25,18 +25,21 @@ const FEED_QUERY = gql`
 `;
 
 export default function Feed({ navigation }) {
-    const { data } = useQuery(FEED_QUERY);
-    console.log(data);
+    const { data, loading } = useQuery(FEED_QUERY);
+    const renderPohoto = ({ item: photo }) => {
+        return (
+            <View style={{ flex: 1 }}>
+                <Text style={{ color: "white" }}>{photo.caption}</Text>
+            </View>
+        );
+    };
     return (
-        <View
-            style={{
-                backgroundColor: "black",
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
-            <Text style={{ color: "white" }}>Feed</Text>
-        </View>
+        <ScreenLayout loading={loading}>
+            <FlatList
+                data={data?.seeFeed}
+                keyExtractor={(pohto) => "" + pohto.id}
+                renderItem={renderPohoto}
+            />
+        </ScreenLayout>
     );
 }
