@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components/native";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useWindowDimensions, Image, TouchableOpacity } from "react-native";
 
@@ -21,14 +22,28 @@ const Username = styled.Text`
     font-weight: 600;
 `;
 const File = styled.Image``;
-const Actions = styled.View``;
-const Action = styled.TouchableOpacity``;
-const Caption = styled.View``;
+const Actions = styled.View`
+    flex-direction: row;
+    align-items: center;
+`;
+const Action = styled.TouchableOpacity`
+    margin-right: 10px;
+`;
+const Caption = styled.View`
+    flex-direction: row;
+`;
 const CaptionText = styled.Text`
     color: white;
+    margin-left: 5px;
 `;
 const Likes = styled.Text`
     color: white;
+    margin: 7px 0px;
+    font-weight: 600;
+`;
+
+const ExtraContainer = styled.View`
+    padding: 10px;
 `;
 
 function Photo({ id, user, caption, file, isLiked, likes }) {
@@ -53,10 +68,24 @@ function Photo({ id, user, caption, file, isLiked, likes }) {
                 source={{ uri: file }}
             />
             <Actions>
-                <Action />
-                <Action />
+                <Action>
+                    <Ionicons
+                        name={isLiked ? "heart" : "heart-outline"}
+                        color={isLiked ? "tomato" : "white"}
+                        size={22}
+                    />
+                </Action>
+                <Action onPress={() => navigation.navigate("Comments")}>
+                    <Ionicons
+                        name='chatbubble-outline'
+                        color='white'
+                        size={22}
+                    />
+                </Action>
             </Actions>
-            <Likes>{likes === 1 ? "1 like" : `${likes} likes`}</Likes>
+            <TouchableOpacity onPress={() => navigation.navigate("Likes")}>
+                <Likes>{likes === 1 ? "1 like" : `${likes} likes`}</Likes>
+            </TouchableOpacity>
             <Caption>
                 <TouchableOpacity
                     onPress={() => navigation.navigate("Profile")}
@@ -65,6 +94,7 @@ function Photo({ id, user, caption, file, isLiked, likes }) {
                 </TouchableOpacity>
                 <CaptionText>{caption}</CaptionText>
             </Caption>
+            <ExtraContainer />
         </Container>
     );
 }
