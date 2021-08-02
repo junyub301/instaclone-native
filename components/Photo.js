@@ -13,9 +13,9 @@ const Header = styled.TouchableOpacity`
 `;
 const UserAvatar = styled.Image`
     margin-right: 10px;
-    width: 30;
-    height: 30;
-    border-radius: 12.5;
+    width: 30px;
+    height: 30px;
+    border-radius: 12.5px;
 `;
 const Username = styled.Text`
     color: white;

@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import React from "react";
+import React, { useState } from "react";
 import { FlatList, Text, View, ActivityIndicator } from "react-native";
 import { COMMNET_FRAGMENT, PHOTO_FRAGMENT } from "../fragments";
 import ScreenLayout from "../components/ScreenLayout";
@@ -26,13 +26,21 @@ const FEED_QUERY = gql`
 `;
 
 export default function Feed({ navigation }) {
-    const { data, loading } = useQuery(FEED_QUERY);
+    const { data, loading, refetch } = useQuery(FEED_QUERY);
     const renderPohoto = ({ item: photo }) => {
         return <Photo {...photo} />;
     };
+    const refresh = async () => {
+        setRefreshing(true);
+        await refetch();
+        setRefreshing(false);
+    };
+    const [refreshing, setRefreshing] = useState(false);
     return (
         <ScreenLayout loading={loading}>
             <FlatList
+                refreshing={refreshing}
+                onRefresh={refresh}
                 style={{ width: "100%" }}
                 showsVerticalScrollIndicator={false}
                 data={data?.seeFeed}
