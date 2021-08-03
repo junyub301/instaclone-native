@@ -46,7 +46,7 @@ export default function Feed({ navigation }) {
         onEndReached : 리스트 끝에 도달했을 때 호출되는 함수 
         */}
             <FlatList
-                onEndReachedThreshold={0.05}
+                onEndReachedThreshold={0.02}
                 onEndReached={() =>
                     fetchMore({
                         variables: {
