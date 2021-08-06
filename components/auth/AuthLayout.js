@@ -1,7 +1,10 @@
 import React from "react";
-import { TouchableWithoutFeedback, Keyboard } from "react-native";
-import { KeyboardAvoidingView, Platform } from "react-native";
-
+import {
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    TouchableWithoutFeedback,
+} from "react-native";
 import styled from "styled-components/native";
 
 const Container = styled.View`
