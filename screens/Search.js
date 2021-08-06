@@ -3,11 +3,23 @@ import { View, Text, TextInput } from "react-native";
 import styled from "styled-components/native";
 import DismissKeyboard from "../components/DismissKeyboard";
 import { useForm } from "react-hook-form";
+import { gql, useLazyQuery } from "@apollo/client";
+
+const SEARCH_PHOTOS = gql`
+    query searchPhotos($keyword: String!) {
+        searchPhotos(keyword: $keyword) {
+            id
+            file
+        }
+    }
+`;
 
 const Inpupt = styled.TextInput``;
 
 export default function Search({ navigation }) {
     const { setValue, register, watch } = useForm();
+    // useQuery를 component가 mount될때 즉시 실행 하지만 useLazyQuery는 바로 실행되지 않는다.
+    const [startQueryFn, { loading, data }] = useLazyQuery(SEARCH_PHOTOS);
     const SearchBox = () => (
         <TextInput
             style={{ backgroundColor: "white" }}
@@ -26,7 +38,7 @@ export default function Search({ navigation }) {
         });
         register("keyword");
     }, []);
-    console.log(watch());
+
     return (
         <DismissKeyboard>
             <View
