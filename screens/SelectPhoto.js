@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
+import * as MediaLibrary from "expo-media-library";
+import { isCompositeType } from "graphql";
 
 const Container = styled.View`
     flex: 1;
@@ -17,10 +19,40 @@ const Bottom = styled.View`
 `;
 
 export default function SelectPhoto() {
+    const [ok, setOk] = useState(false);
+    const [photos, setPhotos] = useState([]);
+    const getPhotos = async () => {
+        console.log(ok);
+        if (ok) {
+            const { assets: photos } = await MediaLibrary.getAssetsAsync();
+            setPhotos(photos);
+        }
+    };
+    const getPermissions = async () => {
+        // 권한을 이미 부여받았는지 확인
+        const {
+            accessPrivileges,
+            canAskAgain,
+        } = await MediaLibrary.getPermissionsAsync();
+        if (accessPrivileges === "none" && canAskAgain) {
+            const {
+                accessPrivileges,
+            } = await MediaLibrary.requestPermissionsAsync();
+            if (accessPrivileges !== "none") {
+                setOk(true);
+            }
+        } else if (accessPrivileges !== "none") {
+            setOk(true);
+        }
+    };
+    useEffect(() => {
+        getPermissions();
+        getPhotos();
+    }, []);
     return (
         <Container>
             <Top />
-            <Bottom />
+            <Bottom></Bottom>
         </Container>
     );
 }
