@@ -90,7 +90,7 @@ export default function SelectPhoto({ navigation }) {
             <IconContainer>
                 <Ionicons
                     name='checkmark-circle'
-                    size='18'
+                    size={18}
                     color={photo.uri === chosenPhoto ? colors.blue : "white"}
                 />
             </IconContainer>
