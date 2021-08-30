@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StatusBar, Image, View, Text, TouchableOpacity } from "react-native";
+import {
+    StatusBar,
+    Image,
+    View,
+    Text,
+    TouchableOpacity,
+    Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styled from "styled-components/native";
 import Slider from "@react-native-community/slider";
@@ -44,9 +51,13 @@ const CloseButton = styled.TouchableOpacity`
     left: 20px;
 `;
 
+const PhotoActions = styled(Actions)`
+    flex-direction: row;
+`;
 const PhotoAction = styled.TouchableOpacity`
     background-color: white;
-    padding: 5px 10px;
+    padding: 5px 25px;
+    height: 30px;
     border-radius: 5px;
 `;
 const PhotoActionText = styled.Text`
@@ -88,6 +99,22 @@ export default function TakePhoto({ navigation }) {
             setFlashMode(Camera.Constants.FlashMode.off);
         }
     };
+    const goToUpload = async (save) => {
+        if (save) {
+            await MediaLibrary.saveToLibraryAsync(takenPhoto);
+        }
+        console.log("Will upload", takenPhoto);
+    };
+    const onUpload = () => {
+        Alert.alert("Save Photo?", "Save Photo & upload or just upload", [
+            {
+                text: "Save & Upload",
+                onPress: () => goToUpload(true),
+            },
+            { text: "Just Upload", onPress: () => goToUpload(false) },
+        ]);
+    };
+
     const onCameraReaday = () => setCameraReady(true);
     const takePhoto = async () => {
         if (camera.current && cameraReady) {
@@ -126,6 +153,7 @@ export default function TakePhoto({ navigation }) {
                     <SliderContainer>
                         <Slider
                             style={{ width: 200, height: 40 }}
+                            value={zoom}
                             minimumValue={0}
                             maximumValue={1}
                             minimumTrackTintColor='#FFFFFF'
@@ -173,17 +201,14 @@ export default function TakePhoto({ navigation }) {
                     </ButtonsContainer>
                 </Actions>
             ) : (
-                <Actions>
+                <PhotoActions>
                     <PhotoAction onPress={onDismiss}>
                         <PhotoActionText>Dismiss</PhotoActionText>
                     </PhotoAction>
-                    <PhotoAction>
-                        <PhotoActionText>uplaod</PhotoActionText>
+                    <PhotoAction onPress={onUpload}>
+                        <PhotoActionText>Uplaod</PhotoActionText>
                     </PhotoAction>
-                    <PhotoAction>
-                        <PhotoActionText>Save & Upload</PhotoActionText>
-                    </PhotoAction>
-                </Actions>
+                </PhotoActions>
             )}
         </Container>
     );
