@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { StatusBar, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styled from "styled-components/native";
 import Slider from "@react-native-community/slider";
@@ -33,8 +33,17 @@ const TakePhotoBtn = styled.TouchableOpacity`
 `;
 
 const SliderContainer = styled.View``;
+const ActionsContainer = styled.View`
+    flex-direction: row;
+`;
 
-export default function TakePhoto() {
+const CloseButton = styled.TouchableOpacity`
+    position: absolute;
+    top: 20px;
+    left: 20px;
+`;
+
+export default function TakePhoto({ navigation }) {
     const [ok, setOk] = useState(false);
     const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
     const [zoom, setZoom] = useState(0);
@@ -57,10 +66,28 @@ export default function TakePhoto() {
     const onZoomValueChange = (e) => {
         setZoom(e);
     };
-    const onFlashChange = () => {};
+    const onFlashChange = () => {
+        if (flashMode === Camera.Constants.FlashMode.off) {
+            setFlashMode(Camera.Constants.FlashMode.on);
+        } else if (flashMode === Camera.Constants.FlashMode.on) {
+            setFlashMode(Camera.Constants.FlashMode.auto);
+        } else if (flashMode === Camera.Constants.FlashMode.auto) {
+            setFlashMode(Camera.Constants.FlashMode.off);
+        }
+    };
     return (
         <Container>
-            <Camera type={camerType} style={{ flex: 1 }} zoom={zoom} />
+            <StatusBar hidden={true} />
+            <Camera
+                type={camerType}
+                style={{ flex: 1 }}
+                zoom={zoom}
+                flashMode={flashMode}
+            >
+                <CloseButton onPress={() => navigation.navigate("Tabs")}>
+                    <Ionicons name='close' color='white' size={30} />
+                </CloseButton>
+            </Camera>
             <Actions>
                 <SliderContainer>
                     <Slider
@@ -74,17 +101,39 @@ export default function TakePhoto() {
                 </SliderContainer>
                 <ButtonsContainer>
                     <TakePhotoBtn />
-                    <TouchableOpacity onPress={onCameraSwitch}>
-                        <Ionicons
-                            size={30}
-                            color='white'
-                            name={
-                                camerType === Camera.Constants.Type.front
-                                    ? "camera-reverse"
-                                    : "camera"
-                            }
-                        />
-                    </TouchableOpacity>
+                    <ActionsContainer>
+                        <TouchableOpacity
+                            onPress={onFlashChange}
+                            style={{ marginRight: 30 }}
+                        >
+                            <Ionicons
+                                size={30}
+                                color='white'
+                                name={
+                                    flashMode === Camera.Constants.FlashMode.off
+                                        ? "flash-off"
+                                        : flashMode ===
+                                          Camera.Constants.FlashMode.on
+                                        ? "flash"
+                                        : flashMode ===
+                                          Camera.Constants.FlashMode.auto
+                                        ? "eye"
+                                        : ""
+                                }
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={onCameraSwitch}>
+                            <Ionicons
+                                size={30}
+                                color='white'
+                                name={
+                                    camerType === Camera.Constants.Type.front
+                                        ? "camera-reverse"
+                                        : "camera"
+                                }
+                            />
+                        </TouchableOpacity>
+                    </ActionsContainer>
                 </ButtonsContainer>
             </Actions>
         </Container>
