@@ -1,9 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
 import * as MediaLibrary from "expo-media-library";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, TouchableOpacity } from "react-native";
+import {
+    FlatList,
+    Image,
+    StatusBar,
+    TouchableOpacity,
+    useWindowDimensions,
+} from "react-native";
 import styled from "styled-components/native";
-import { Ionicons } from "@expo/vector-icons";
-import useWindowDimensions from "react-native/Libraries/Utilities/useWindowDimensions";
 import { colors } from "../colors";
 
 const Container = styled.View`
@@ -64,7 +69,13 @@ export default function SelectPhoto({ navigation }) {
         }
     };
     const HeaderRight = () => (
-        <TouchableOpacity>
+        <TouchableOpacity
+            onPress={() =>
+                navigation.navigate("UploadForm", {
+                    file: chosenPhoto,
+                })
+            }
+        >
             <HeaderRightText>Next</HeaderRightText>
         </TouchableOpacity>
     );
@@ -98,6 +109,7 @@ export default function SelectPhoto({ navigation }) {
     );
     return (
         <Container>
+            <StatusBar hidden={false} />
             <Top>
                 {chosenPhoto !== "" ? (
                     <Image
