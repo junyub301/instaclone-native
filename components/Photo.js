@@ -23,8 +23,8 @@ const Header = styled.TouchableOpacity`
 `;
 const UserAvatar = styled.Image`
     margin-right: 10px;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     border-radius: 12.5px;
 `;
 const Username = styled.Text`
@@ -62,7 +62,7 @@ function Photo({ id, user, caption, file, isLiked, likes }) {
     const [imageHeight, setImageHeight] = useState(height - 450);
     useEffect(() => {
         Image.getSize(file, (width, height) => {
-            setImageHeight(height);
+            setImageHeight(height / 3);
         });
     }, [file]);
     const updateToggleLike = (cache, result) => {
