@@ -13,6 +13,8 @@ export default function MessageNav() {
                 headerTintColor: "white",
                 headerBackTitleVisible: false,
                 headerStyle: {
+                    borderBottomColor: "rgba(255, 255, 255, 0.3)",
+                    shadowColor: "rgba(255, 255, 255, 0.3)",
                     backgroundColor: "black",
                 },
             }}
