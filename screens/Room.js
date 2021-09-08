@@ -1,8 +1,10 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import React, { useEffect } from "react";
-import { FlatList, KeyboardAvoidingView } from "react-native";
+import { FlatList, KeyboardAvoidingView, View } from "react-native";
 import styled from "styled-components/native";
 import ScreenLayout from "../components/ScreenLayout";
+import { useForm } from "react-hook-form";
+import useMe from "../hooks/useMe";
 
 const SEND_MESSAGE_MUTATION = gql`
     mutation sendMessage($payload: String!, $roomId: Int, $userId: Int) {
@@ -31,7 +33,7 @@ const ROOM_QUERY = gql`
 
 const MessageContainer = styled.View`
     padding: 0px 10px;
-    flex-direction: ${(props) => (props.outGoing ? "flex-revers" : "row")};
+    flex-direction: ${(props) => (props.outGoing ? "row-reverse" : "row")};
     align-items: flex-end;
 `;
 const Author = styled.View``;
@@ -61,10 +63,71 @@ const TextInput = styled.TextInput`
 `;
 
 export default function Room({ route, navigation }) {
+    const { data: meData } = useMe();
+    const { register, setValue, handleSubmit, getValues } = useForm();
+
+    const updateSendMessage = (cache, result) => {
+        const {
+            data: {
+                sendMessage: { ok, id },
+            },
+        } = result;
+        if (ok && meData) {
+            const { message } = getValues();
+            const messageObj = {
+                id,
+                payload: message,
+                user: {
+                    username: meData.me.username,
+                    avatar: meData.me.avatar,
+                },
+                read: true,
+                __typename: "Message",
+            };
+        }
+        const messageFragment = cache.writeFragment({
+            fragment: gql`
+                fragment NewMessage on Message {
+                    id
+                    payload
+                    user {
+                        username
+                        avatar
+                    }
+                    read
+                }
+            `,
+            data: messageObj,
+        });
+        cache.modify({
+            id: `Room:${route.params.id}`,
+            fields: {
+                message(prev) {
+                    return [messageFragment, ...prev];
+                },
+            },
+        });
+    };
+    const [
+        sendMessageMutation,
+        { loading: sendingMessage },
+    ] = useMutation(SEND_MESSAGE_MUTATION, { update: updateSendMessage });
     const { data, loading } = useQuery(ROOM_QUERY, {
         variables: { id: route?.params?.id },
     });
-
+    const onValid = ({ message }) => {
+        if (!sendingMessage) {
+            sendMessageMutation({
+                variables: {
+                    payload: message,
+                    roomId: route?.params?.id,
+                },
+            });
+        }
+    };
+    useEffect(() => {
+        register("message", { required: true });
+    }, [register]);
     useEffect(() => {
         navigation.setOptions({
             title: `${route?.params?.talkingTo?.username}`,
@@ -90,8 +153,10 @@ export default function Room({ route, navigation }) {
         >
             <ScreenLayout loading={loading}>
                 <FlatList
-                    inverted
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", paddingTop: 10 }}
+                    ItemSeparatorComponent={() => (
+                        <View style={{ height: 20 }} />
+                    )}
                     data={data?.seeRoom?.messages}
                     keyExtractor={(message) => "" + message.id}
                     renderItem={renderItem}
@@ -101,6 +166,8 @@ export default function Room({ route, navigation }) {
                     placeholder='Write a message...'
                     returnKeyLabel='Send Message'
                     returnKeyType='send'
+                    onChangeText={(text) => setValue("message", text)}
+                    onSubmitEditing={handleSubmit(onValid)}
                 />
             </ScreenLayout>
         </KeyboardAvoidingView>
