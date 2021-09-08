@@ -18,6 +18,7 @@ const SEND_MESSAGE_MUTATION = gql`
 const ROOM_QUERY = gql`
     query seeRoom($id: Int!) {
         seeRoom(id: $id) {
+            id
             messages {
                 id
                 payload
@@ -64,7 +65,7 @@ const TextInput = styled.TextInput`
 
 export default function Room({ route, navigation }) {
     const { data: meData } = useMe();
-    const { register, setValue, handleSubmit, getValues } = useForm();
+    const { register, setValue, handleSubmit, getValues, watch } = useForm();
 
     const updateSendMessage = (cache, result) => {
         const {
@@ -74,6 +75,7 @@ export default function Room({ route, navigation }) {
         } = result;
         if (ok && meData) {
             const { message } = getValues();
+            setValue("message", "");
             const messageObj = {
                 id,
                 payload: message,
@@ -84,29 +86,30 @@ export default function Room({ route, navigation }) {
                 read: true,
                 __typename: "Message",
             };
-        }
-        const messageFragment = cache.writeFragment({
-            fragment: gql`
-                fragment NewMessage on Message {
-                    id
-                    payload
-                    user {
-                        username
-                        avatar
+            const messageFragment = cache.writeFragment({
+                fragment: gql`
+                    fragment NewMessage on Message {
+                        id
+                        payload
+                        user {
+                            username
+                            avatar
+                        }
+                        read
                     }
-                    read
-                }
-            `,
-            data: messageObj,
-        });
-        cache.modify({
-            id: `Room:${route.params.id}`,
-            fields: {
-                message(prev) {
-                    return [messageFragment, ...prev];
+                `,
+                data: messageObj,
+            });
+            cache.modify({
+                id: `Room:${route.params.id}`,
+                fields: {
+                    messages(prev) {
+                        console.log(prev);
+                        return [...prev, messageFragment];
+                    },
                 },
-            },
-        });
+            });
+        }
     };
     const [
         sendMessageMutation,
@@ -153,7 +156,11 @@ export default function Room({ route, navigation }) {
         >
             <ScreenLayout loading={loading}>
                 <FlatList
-                    style={{ width: "100%", paddingTop: 10 }}
+                    style={{
+                        width: "100%",
+                        paddingVertical: 10,
+                        marginBottom: 50,
+                    }}
                     ItemSeparatorComponent={() => (
                         <View style={{ height: 20 }} />
                     )}
@@ -168,6 +175,7 @@ export default function Room({ route, navigation }) {
                     returnKeyType='send'
                     onChangeText={(text) => setValue("message", text)}
                     onSubmitEditing={handleSubmit(onValid)}
+                    value={watch("message")}
                 />
             </ScreenLayout>
         </KeyboardAvoidingView>
