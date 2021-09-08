@@ -41,10 +41,10 @@ export default function App() {
             tokenVar(token);
         }
         await persistor.purge();
-        await persistCache({
+        /* await persistCache({
             cache,
             storage: new AsyncStorageWrapper(AsyncStorage),
-        });
+        }); */
 
         return preloadAssets();
     };

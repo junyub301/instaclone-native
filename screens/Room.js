@@ -5,7 +5,7 @@ import styled from "styled-components/native";
 import ScreenLayout from "../components/ScreenLayout";
 import { useForm } from "react-hook-form";
 import useMe from "../hooks/useMe";
-
+import { Ionicons } from "@expo/vector-icons";
 const SEND_MESSAGE_MUTATION = gql`
     mutation sendMessage($payload: String!, $roomId: Int, $userId: Int) {
         sendMessage(payload: $payload, roomId: $roomId, userId: $userId) {
@@ -54,14 +54,22 @@ const Message = styled.Text`
 `;
 
 const TextInput = styled.TextInput`
-    margin-bottom: 50px;
-    margin-top: 25px;
-    width: 95%;
+    width: 90%;
+    margin-right: 10px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     padding: 10px 20px;
     color: white;
     border-radius: 1000px;
 `;
+
+const InputContainer = styled.View`
+    width: 95%;
+    margin-bottom: 50px;
+    margin-top: 25px;
+    flex-direction: row;
+    align-items: center;
+`;
+const SendButton = styled.TouchableOpacity``;
 
 export default function Room({ route, navigation }) {
     const { data: meData } = useMe();
@@ -104,7 +112,6 @@ export default function Room({ route, navigation }) {
                 id: `Room:${route.params.id}`,
                 fields: {
                     messages(prev) {
-                        console.log(prev);
                         return [...prev, messageFragment];
                     },
                 },
@@ -115,9 +122,11 @@ export default function Room({ route, navigation }) {
         sendMessageMutation,
         { loading: sendingMessage },
     ] = useMutation(SEND_MESSAGE_MUTATION, { update: updateSendMessage });
+
     const { data, loading } = useQuery(ROOM_QUERY, {
         variables: { id: route?.params?.id },
     });
+
     const onValid = ({ message }) => {
         if (!sendingMessage) {
             sendMessageMutation({
@@ -128,14 +137,17 @@ export default function Room({ route, navigation }) {
             });
         }
     };
+
     useEffect(() => {
         register("message", { required: true });
     }, [register]);
+
     useEffect(() => {
         navigation.setOptions({
             title: `${route?.params?.talkingTo?.username}`,
         });
     }, []);
+
     const renderItem = ({ item: message }) => (
         <MessageContainer
             outGoing={
@@ -148,6 +160,8 @@ export default function Room({ route, navigation }) {
             <Message>{message.payload}</Message>
         </MessageContainer>
     );
+    const messages = [...(data?.seeRoom?.messages ?? [])];
+    messages.reverse();
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: "balck" }}
@@ -158,25 +172,42 @@ export default function Room({ route, navigation }) {
                 <FlatList
                     style={{
                         width: "100%",
-                        paddingVertical: 10,
-                        marginBottom: 50,
+                        marginVertical: 10,
                     }}
+                    inverted
                     ItemSeparatorComponent={() => (
-                        <View style={{ height: 20 }} />
+                        <View style={{ height: 20 }}></View>
                     )}
-                    data={data?.seeRoom?.messages}
+                    data={messages}
+                    showsVerticalScrollIndicator={false}
                     keyExtractor={(message) => "" + message.id}
                     renderItem={renderItem}
                 />
-                <TextInput
-                    placegolderTextColor='rgba(255,255,255,0.5)'
-                    placeholder='Write a message...'
-                    returnKeyLabel='Send Message'
-                    returnKeyType='send'
-                    onChangeText={(text) => setValue("message", text)}
-                    onSubmitEditing={handleSubmit(onValid)}
-                    value={watch("message")}
-                />
+                <InputContainer>
+                    <TextInput
+                        placeholderTextColor='rgba(255,255,255,0.5)'
+                        placeholder='Write a message...'
+                        returnKeyLabel='Send Message'
+                        returnKeyType='send'
+                        onChangeText={(text) => setValue("message", text)}
+                        onSubmitEditing={handleSubmit(onValid)}
+                        value={watch("message")}
+                    />
+                    <SendButton
+                        onPress={handleSubmit(onValid)}
+                        disabled={!Boolean(watch("message"))}
+                    >
+                        <Ionicons
+                            name='send'
+                            color={
+                                !Boolean(watch("message"))
+                                    ? "rgba(255,255,255,0.5)"
+                                    : "white"
+                            }
+                            size={22}
+                        />
+                    </SendButton>
+                </InputContainer>
             </ScreenLayout>
         </KeyboardAvoidingView>
     );
